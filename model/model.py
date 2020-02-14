@@ -11,7 +11,7 @@ class ColorizeGrayScale(Model):
     "Encapsulate the encoder-decoder network"
 
     def __init__(self, is_training: bool, l2_reg: Callable,
-                 name='Colorize_grayscale',
+                 name: str = 'Colorize_grayscale',
                  in_h: int = 224, in_w: int = 224):
         super().__init__(name=name)
         self.is_training = is_training
@@ -19,7 +19,10 @@ class ColorizeGrayScale(Model):
         self.in_h = in_h
         self.in_w = in_w
 
-    def _encoder(self, x):
+    def _encoder(self, x: tf.Tensor) -> tf.Tensor:
+        """
+        Encapsulate the encoder part of the model
+        """
         x = tf.image.resize(x, size=(self.in_w, self.in_h),
                             method=tf.image.ResizeMethod.BICUBIC)
         x = Conv2D(filters=64, kernel_size=3, strides=2, padding='same',
@@ -56,7 +59,10 @@ class ColorizeGrayScale(Model):
                    kernel_regularizer=self.reg)(x)
         return x
 
-    def _fusion(self, x, y):
+    def _fusion(self, x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
+        """
+        Encapsulate the fusion part of the model
+        """
         _, w, h, _ = x.shape
         y = tf.tile(y, (w, h, 1))
         y = tf.expand_dims(y, 0)
@@ -67,7 +73,10 @@ class ColorizeGrayScale(Model):
                    kernel_regularizer=self.reg)(x)
         return x
 
-    def _decoder(self, x):
+    def _decoder(self, x: tf.Tensor) -> tf.Tensor:
+        """
+        Encapsulate the decoder part of the model
+        """
         x = Conv2D(filters=128, kernel_size=3, strides=1, padding='same',
                    activation='relu',
                    kernel_initializer='he_normal',
@@ -110,7 +119,7 @@ class ColorizeGrayScale(Model):
             x)
         return x
 
-    def call(self, inputs, training=None, mask=None):
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
         x1 = self._encoder(inputs)
         x2 = InceptionResNetV2(include_top=False, pooling='avg')(inputs)
         x2 = tf.expand_dims(x2, 0)
