@@ -22,7 +22,7 @@ logger.info(
     'Training will run on {} GPUs:'.format(strategy.num_replicas_in_sync))
 
 # Select the batch size per replica
-BATCH_SIZE_PER_REPLICA = 4
+BATCH_SIZE_PER_REPLICA = 16
 BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
 
 # Select epochs
@@ -38,12 +38,12 @@ dataset_train_obj = ColorizeDataset(
     path="../dataset/train_data",
     img_ext="*.jpg",
     batch_size=BATCH_SIZE,
-    n_workers=8)
+    n_workers=12)
 dataset_valid_obj = ColorizeDataset(
     path="../dataset/valid_data",
     img_ext="*.jpg",
     batch_size=BATCH_SIZE,
-    n_workers=8,
+    n_workers=12,
     is_validation=True,
     is_training=False)
 
@@ -69,8 +69,8 @@ tensorboard = TensorBoard(log_dir=train_log_dir, histogram_freq=0,
 
 model_checkpoint = ModelCheckpoint(filepath=model_tag, monitor='loss',
                                    verbose=1, save_best_only=True)
-reduce_lr = ReduceLROnPlateau(monitor='valid_loss', patience=10)
-early_stop = EarlyStopping('valid_loss', patience=10)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', patience=10)
+early_stop = EarlyStopping('val_loss', patience=10)
 
 callbacks = [tensorboard, model_checkpoint, reduce_lr, early_stop]
 

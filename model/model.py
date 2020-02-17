@@ -152,6 +152,7 @@ class ColorizeGrayScale(Model):
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         input1 = inputs['input_1']
         input2 = inputs['input_2']
+
         x1 = self._encoder(input1)
         x2 = self.inception(input2)
         x2 = tf.expand_dims(x2, axis=1)
