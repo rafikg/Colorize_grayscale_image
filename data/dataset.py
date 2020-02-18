@@ -83,7 +83,7 @@ class ColorizeDataset(object):
 
         # decode the image
         img = tf.image.decode_jpeg(img_contents, channels=3)
-        img = tf.cast(img, dtype=tf.float64)
+        # img = tf.cast(img, dtype=tf.float64)
         x['input_1'] = img
         x['input_2'] = img
         y = img
@@ -121,6 +121,9 @@ class ColorizeDataset(object):
         dataset = dataset.map(lambda x, y: get_gray_and_ab(x),
                               num_parallel_calls=self.n_workers)
 
+        # Normalize data between [-1, 1]
+        dataset = dataset.map(lambda x, y: normalize(x, y))
+
         # crop or pad images
         dataset = dataset.map(
             lambda x, y: crop_or_pad_image(x=x, y=y,
@@ -130,8 +133,7 @@ class ColorizeDataset(object):
                                            in_w_br2=self.in_width_br2),
             num_parallel_calls=self.n_workers)
 
-        # Normalize data between [-1, 1]
-        dataset = dataset.map(lambda x, y: normalize(x, y))
+
 
         dataset = dataset.batch(self.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(buffer_size=1)

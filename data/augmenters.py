@@ -8,7 +8,7 @@ from . import normalize_rgb, normalize_ab, gray_to_rgb
 def crop_or_pad_image(x: dict, y: tf.Tensor,
                       in_h_br1: int, in_w_br1: int,
                       in_h_br2: int, in_w_br2: int) -> Tuple[
-                                                       dict, tf.Tensor]:
+    dict, tf.Tensor]:
     """
         Random crop or pad x and y image with zero
         Parameters
@@ -42,10 +42,9 @@ def crop_or_pad_image(x: dict, y: tf.Tensor,
     y_crop = concat_crop[:, :, last_dim_x:]
 
     # input_2
-    x2_crop = tf.cast(tf.image.resize(img, size=(in_h_br2,
-                                                 in_w_br2),
-                                      method=tf.image.ResizeMethod.BICUBIC),
-                      tf.float64)
+    x2_crop = tf.image.resize(img, size=(in_h_br2,
+                                         in_w_br2),
+                              method=tf.image.ResizeMethod.BICUBIC)
 
     # convert input_2 to 3-channels grayscale
     x2_crop = tf.squeeze(x2_crop, axis=-1)
@@ -77,7 +76,7 @@ def flip(x: dict) -> Tuple[dict, tf.Tensor]:
 
 
 def normalize(x: dict, y: tf.Tensor) -> Tuple[
-                                        dict, tf.Tensor]:
+    dict, tf.Tensor]:
     """
     Normalize rgb and ab image between [-1, 1]
     Parameters

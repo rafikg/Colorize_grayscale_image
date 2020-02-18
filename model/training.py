@@ -69,7 +69,7 @@ tensorboard = TensorBoard(log_dir=train_log_dir, histogram_freq=0,
 
 model_checkpoint = ModelCheckpoint(filepath=model_tag, monitor='loss',
                                    verbose=1, save_best_only=True)
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', patience=10)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', patience=2)
 early_stop = EarlyStopping('val_loss', patience=10)
 
 callbacks = [tensorboard, model_checkpoint, reduce_lr, early_stop]
