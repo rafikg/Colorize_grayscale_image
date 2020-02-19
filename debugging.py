@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 from data import ColorizeDataset
-from utils import rgb_to_lab, lab_to_rgb
+from utils import (rgb_to_lab, lab_to_rgb, lab_to_xyz, rgb_to_xyz, xyz_to_lab,
+                   xyz_to_rgb)
 import skimage.io as io
 import skimage.color as color
+
 
 def plot_img(x, y):
     f, axarr = plt.subplots(2, 2)
@@ -24,15 +26,15 @@ def plot_img(x, y):
 
 
 image = io.imread("./images/index.jpeg")
-
 ski_lab = color.rgb2lab(image)
-
-print("ski_lab min_max", ski_lab.min(), ski_lab.max())
-
-lab = rgb_to_lab(image).numpy()
-print("lab min_max ", lab.min(), lab.max())
-
+lab = rgb_to_lab(image)
 rgb = lab_to_rgb(lab)
+ski_rgb = color.lab2rgb(lab)
+print("ski_lab min_max", ski_lab.min(), ski_lab.max())
+print("lab min_max", lab.numpy().min(), lab.numpy().max())
+
+print("ski_rgb min_max", ski_rgb.min(), ski_rgb.max())
+print("rgb min_max", rgb.numpy().min(), rgb.numpy().max())
 
 plt.imshow(rgb)
 plt.show()

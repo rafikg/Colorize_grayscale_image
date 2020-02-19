@@ -104,11 +104,11 @@ def xyz_to_rgb(image: tf.Tensor) -> tf.Tensor:
     r = var_r * 255
     g = var_g * 255
     b = var_b * 255
-    rgb_image = tf.stack([r, g, b], axis=-1)
+    rgb_image = tf.cast(tf.stack([r, g, b], axis=-1), tf.uint8)
     return rgb_image
 
 
-def rgb_xyz(image: tf.Tensor) -> tf.Tensor:
+def rgb_to_xyz(image: tf.Tensor) -> tf.Tensor:
     """
     Convert an image from RGB color space to XYZ color space
     Parameters
@@ -154,7 +154,7 @@ def rgb_to_lab(image: tf.Tensor) -> tf.Tensor:
     -------
     tf.tensor: LAB image
     """
-    xyz = rgb_xyz(image)
+    xyz = rgb_to_xyz(image)
     lab_image = xyz_to_lab(xyz)
     return lab_image
 

@@ -11,10 +11,10 @@ import numpy as np
 
 model = ColorizeGrayScale(is_training=True, l2_reg=reg)
 
-model.load_weights('../model_weights/model.06')
+model.load_weights('../model_weights/model.07')
 
 # prepare the input
-rgb = io.imread('../images/index1.jpeg').astype('float64')
+rgb = io.imread('../images/index1.jpeg')
 
 # resize the image
 input_1 = transform.resize(rgb, (224, 224))
@@ -51,7 +51,7 @@ output = output * 128
 lab_result = tf.stack([l_channel, output[:, :, 0], output[:, :, 1]], axis=-1)
 
 # convert lab result to rgb
-rgb_colorized = color.lab2rgb(lab_result)
+rgb_colorized = lab_to_rgb(lab_result)
 
 # plot the result
 plt.imshow(rgb_colorized)
