@@ -123,8 +123,6 @@ class ColorizeDataset(object):
         # convert rgb to lab and return
         dataset = dataset.map(lambda x, y: get_gray_and_ab(x),
                               num_parallel_calls=self.n_workers)
-
-
         # crop or pad images
         dataset = dataset.map(
             lambda x, y: crop_or_pad_image(x=x, y=y,

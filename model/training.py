@@ -21,11 +21,11 @@ logger.info(
     'Training will run on {} GPUs:'.format(strategy.num_replicas_in_sync))
 
 # Select the batch size per replica
-BATCH_SIZE_PER_REPLICA = 8
+BATCH_SIZE_PER_REPLICA = 16
 BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
 
 # Select epochs
-EPOCHS = 300
+EPOCHS = 10
 
 # Define the optimizer
 optimizer = tf.optimizers.Adam(learning_rate=1e-3)
@@ -37,15 +37,15 @@ dataset_train_obj = ColorizeDataset(
     path="../dataset/train_data",
     img_ext="*.jpg",
     batch_size=BATCH_SIZE,
-    debug_mode=True,
-    n_workers=12)
+    debug_mode=False,
+    n_workers=8)
 
 dataset_valid_obj = ColorizeDataset(
     path="../dataset/valid_data",
     img_ext="*.jpg",
     batch_size=BATCH_SIZE,
-    n_workers=12,
-    debug_mode=True,
+    n_workers=8,
+    debug_mode=False,
     is_validation=True,
     is_training=False)
 
@@ -59,11 +59,11 @@ train_dataset = dataset_train_obj.tf_data
 valid_dataset = dataset_valid_obj.tf_data
 
 # Define the model inside a strategy.scope
-# with strategy.scope():
-# create the model
-model = ColorizeGrayScale(l2_reg=reg)
-# Compile the model
-model.compile(optimizer=optimizer, loss='mean_squared_error')
+with strategy.scope():
+    # create the model
+    model = ColorizeGrayScale(l2_reg=reg)
+    # Compile the model
+    model.compile(optimizer=optimizer, loss='mean_squared_error')
 
 # Define Callbacks list
 current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -79,18 +79,16 @@ tensorboard = TensorBoard(log_dir=train_log_dir,
 
 model_checkpoint = ModelCheckpoint(filepath=model_tag, monitor='loss',
                                    verbose=1, save_best_only=True, mode='min')
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', mode='min', patience=2,
-                              min_delta=0.1)
-early_stop = EarlyStopping('val_loss', mode='min', patience=2, min_delta=0.1)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', mode='min', patience=10)
+early_stop = EarlyStopping('val_loss', mode='min', patience=10)
 
-callbacks = [tensorboard, model_checkpoint]
+callbacks = [tensorboard, model_checkpoint, reduce_lr, early_stop]
 
 # Start training the model
 model.fit(x=train_dataset,
           steps_per_epoch=None,
           validation_data=valid_dataset,
           validation_steps=None,
-          epochs=1,
+          epochs=EPOCHS,
           callbacks=callbacks)
-
 model.summary()
