@@ -1,6 +1,5 @@
 import tensorflow as tf
 import matplotlib.pyplot as plt
-import os
 import glob
 from utils import rgb_to_lab, lab_to_rgb
 from model import ColorizeGrayScale
@@ -52,10 +51,10 @@ batch_input_2 = tf.reshape(batch_input_2, shape=(-1, 229, 229, 3))
 inputs = {'input_1': batch_input_1, 'input_2': batch_input_2}
 
 # build the model
-model = ColorizeGrayScale(l2_reg=reg)
+model = ColorizeGrayScale(l2_reg=reg, is_training=False)
 
 # upload the weights
-model.load_weights('../model_weights/model.09')
+model.load_weights('../model_weights/model.06')
 
 # run the model
 output = model(inputs)
