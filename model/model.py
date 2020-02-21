@@ -7,8 +7,6 @@ from tensorflow.keras.layers import Conv2D, Conv2DTranspose, Concatenate, \
 from tensorflow.keras.applications.inception_resnet_v2 import InceptionResNetV2
 from tensorflow.keras.regularizers import l2
 
-from data import ColorizeDataset
-
 
 class ColorizeGrayScale(Model):
     "Encapsulate the encoder-decoder network"
@@ -153,7 +151,6 @@ class ColorizeGrayScale(Model):
         x = self.decod_conv6(x)
         x = self.decod_conv7(x)
         x = self.decod_conv8(x)
-
         return x
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
@@ -169,23 +166,3 @@ class ColorizeGrayScale(Model):
 
         x = self._decoder(x)
         return x
-
-
-if __name__ == "__main__":
-    BATCH_SIZE = 1
-    model = ColorizeGrayScale(l2_reg=l2(1e-3))
-
-    # dataset_train_obj = ColorizeDataset(
-    #     path="../dataset/train_data",
-    #     img_ext="*.jpg",
-    #     batch_size=BATCH_SIZE,
-    #     n_workers=12)
-    # from utils import rgb_to_lab, lab_to_rgb
-    # import skimage.color as color
-    #
-    # data_set = dataset_train_obj.tf_data
-    # for x, y in data_set:
-    #     ski_lab = color.rgb2lab(x['input_1'])
-    #     lab = rgb_to_lab(x['input_1'])
-    #     print("ski_lab min_max", ski_lab.min(), ski_lab.max())
-    #     print("lab min_max", lab.numpy().min(), lab.numpy().max())

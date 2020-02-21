@@ -4,6 +4,7 @@ from utils import (rgb_to_lab, lab_to_rgb, lab_to_xyz, rgb_to_xyz, xyz_to_lab,
                    xyz_to_rgb)
 import skimage.io as io
 import skimage.color as color
+import skimage.transform as transform
 
 
 def plot_img(x, y):
@@ -26,11 +27,12 @@ for x, y in data:
                                                 x['input_1'].numpy().max(),
                                                 x['input_2'].dtype,
                                                 x['input_2'].numpy().max(),
-                                                y.dtype,
+                                                y.numpy().min(),
                                                 y.numpy().max()))
-#     # plot_img(x, y)
+#     plot_img(x, y)
 
 # image = io.imread("./images/index1.jpeg")
+# image = transform.resize(image, (224, 224))*255
 # ski_lab = color.rgb2lab(image)
 # lab = rgb_to_lab(image)
 # rgb = lab_to_rgb(lab)
