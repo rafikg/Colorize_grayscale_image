@@ -1,3 +1,3 @@
 from tensorflow.keras.regularizers import l2
 
-reg = l2(1e-4)
+reg = l2(0)

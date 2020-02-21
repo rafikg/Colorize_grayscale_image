@@ -68,6 +68,22 @@ def normalize_ab(image: tf.Tensor) -> tf.Tensor:
     return image
 
 
+def normalize_l(image: tf.Tensor) -> tf.Tensor:
+    """
+    Normalize l channel between [-1, 1]
+    l is between 0 and 100
+    Parameters:
+    ----------
+    image: tf.Tensor
+
+    Returns:
+    -------
+    normalized image: tf.Tensor
+    """
+    image = 2 * image / 100 - 1
+    return image
+
+
 def get_l_channel(image: tf.Tensor) -> tf.Tensor:
     """
     Get the channel l of the LAB image
@@ -100,9 +116,7 @@ def get_gray_and_ab(image: dict) -> Tuple[dict, tf.Tensor]:
     img = image['input_1']
     gray = rgb_to_gray(img)
     lab = rgb_to_lab(img)
-    _, a, b = tf.unstack(lab, axis=-1)
-
-    ab = tf.stack([a, b], axis=-1)
+    ab = lab[:, :, 1:]
     image['input_1'] = gray
     image['input_2'] = gray
     return image, ab

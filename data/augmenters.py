@@ -2,7 +2,7 @@ from typing import Tuple
 
 import tensorflow as tf
 
-from . import normalize_rgb, normalize_ab, gray_to_rgb
+from . import normalize_rgb, normalize_ab, normalize_l, gray_to_rgb
 
 
 def crop_or_pad_image(x: dict, y: tf.Tensor,
