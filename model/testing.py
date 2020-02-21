@@ -28,7 +28,6 @@ l_channel = lab_img[:, :, 0]
 
 # convert to grayscale
 input_1 = tf.image.rgb_to_grayscale(input_1)
-gray = input_1
 input_2 = tf.image.rgb_to_grayscale(input_2)
 input_2 = tf.stack([input_2[:, :, 0]] * 3, axis=2)
 
@@ -50,9 +49,7 @@ output = tf.squeeze(output, axis=0)
 output = output * 128
 
 # Add grayscale channel with output
-lab_result = tf.stack(
-    [tf.cast(l_channel, tf.float32), output[:, :, 0], output[:, :, 1]],
-    axis=-1)
+lab_result = tf.stack([l_channel, output[:, :, 0], output[:, :, 1]], axis=-1)
 
 # convert lab result to rgb
 rgb_colorized = lab_to_rgb(lab_result)
