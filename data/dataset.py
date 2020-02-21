@@ -1,4 +1,4 @@
-from typing import List, Tuple, Callable
+from typing import List, Tuple, Callable, Optional
 
 from pathlib import Path
 from . import flip, crop_or_pad_image, get_gray_and_ab, normalize
@@ -25,6 +25,7 @@ class ColorizeDataset(object):
                  is_training: bool = True,
                  is_validation: bool = False,
                  is_shuffle: bool = True,
+                 debug_mode: bool = True,
                  name='Pascal2012'):
 
         self.path = Path(path)
@@ -40,6 +41,7 @@ class ColorizeDataset(object):
         self.is_training = is_training
         self.is_validation = is_validation
         self.is_shuffle = is_shuffle
+        self.debug_mode = debug_mode
 
         self.name = name
 
@@ -47,6 +49,8 @@ class ColorizeDataset(object):
             raise IOError(f"{self.path}' is invalid path")
 
         self.imgs_list = self.load_files_list()
+        if self.debug_mode:
+            self.imgs_list = self.imgs_list[:8]
         self.tf_data = self.create_dataset()
 
         # is_validation and is_training should be both true or both false
@@ -83,7 +87,6 @@ class ColorizeDataset(object):
 
         # decode the image
         img = tf.image.decode_jpeg(img_contents, channels=3)
-        # img = tf.cast(img, dtype=tf.float64)
         x['input_1'] = img
         x['input_2'] = img
         y = img
@@ -121,8 +124,6 @@ class ColorizeDataset(object):
         dataset = dataset.map(lambda x, y: get_gray_and_ab(x),
                               num_parallel_calls=self.n_workers)
 
-        # Normalize data between [-1, 1]
-        dataset = dataset.map(lambda x, y: normalize(x, y))
 
         # crop or pad images
         dataset = dataset.map(
@@ -133,9 +134,12 @@ class ColorizeDataset(object):
                                            in_w_br2=self.in_width_br2),
             num_parallel_calls=self.n_workers)
 
-
+        # Normalize data between [-1, 1]
+        dataset = dataset.map(lambda x, y: normalize(x, y))
 
         dataset = dataset.batch(self.batch_size, drop_remainder=True)
         dataset = dataset.prefetch(buffer_size=1)
-
         return dataset
+
+    def __len__(self):
+        return len(self.imgs_list)

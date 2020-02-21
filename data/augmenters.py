@@ -23,37 +23,34 @@ def crop_or_pad_image(x: dict, y: tf.Tensor,
         -------
         x, y: Tuple(dict, tf.Tensor)
         """
-    img = x['input_1']
+    img1 = x['input_1']
+    img2 = x['input_2']
 
-    x_shape = img.shape
-    last_dim_x = x_shape[-1]
-
-    concat = tf.concat([img, y], axis=-1)
-
-    concat_crop = tf.image.resize_with_crop_or_pad(
-        image=concat,
+    crop_1 = tf.image.resize_with_crop_or_pad(
+        image=img1,
         target_height=in_h_br1,
         target_width=in_w_br1
     )
-    # input_1
-    x1_crop = concat_crop[:, :, :last_dim_x]
 
-    # output
-    y_crop = concat_crop[:, :, last_dim_x:]
+    crop_y = tf.image.resize_with_crop_or_pad(
+        image=y,
+        target_height=in_h_br1,
+        target_width=in_w_br1
+    )
 
-    # input_2
-    x2_crop = tf.image.resize(img, size=(in_h_br2,
-                                         in_w_br2),
-                              method=tf.image.ResizeMethod.BICUBIC)
+    crop_2 = tf.image.resize_with_crop_or_pad(image=img2,
+                                              target_height=in_h_br2,
+                                              target_width=in_w_br2
+                                              )
 
     # convert input_2 to 3-channels grayscale
-    x2_crop = tf.squeeze(x2_crop, axis=-1)
-    x2_crop = gray_to_rgb(x2_crop)
+    crop_2 = tf.squeeze(crop_2, axis=-1)
+    crop_2 = gray_to_rgb(crop_2)
 
-    x['input_1'] = x1_crop
-    x['input_2'] = x2_crop
-    y = y_crop
-    return x, y
+    x['input_1'] = crop_1
+    x['input_2'] = crop_2
+
+    return x, crop_y
 
 
 def flip(x: dict) -> Tuple[dict, tf.Tensor]:
