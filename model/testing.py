@@ -8,19 +8,24 @@ import skimage.transform as transform
 import skimage.color as color
 import matplotlib.pyplot as plt
 import numpy as np
+from keras import backend as K
 
-model = ColorizeGrayScale(is_training=True, l2_reg=reg)
+# Do some code, e.g. train and save model
 
-model.load_weights('../model_weights/model.06')
+K.clear_session()
+model = ColorizeGrayScale(l2_reg=reg)
+
+model.load_weights('../model_weights/model.53')
 
 # prepare the input
-rgb = io.imread('../images/index1.jpeg').astype('float64')
+rgb = io.imread('../images/2007_000027.jpg')
 
 # resize the image
-input_1 = transform.resize(rgb, (224, 224))
-input_2 = transform.resize(rgb, (229, 229))
+input_1 = transform.resize(rgb, (224, 224)).astype(np.float32)
+input_2 = transform.resize(rgb, (229, 229)).astype(np.float32)
 # conver input_1 to lab
 lab_img = rgb_to_lab(input_1)
+
 l_channel = lab_img[:, :, 0]
 
 # convert to grayscale
@@ -43,6 +48,7 @@ inputs = {'input_1': input_1, 'input_2': input_2}
 output = model(inputs)
 
 output = np.squeeze(output.numpy(), axis=0)
+print(np.unique(output))
 
 # Multiply output by 128
 output = output * 128
@@ -51,8 +57,8 @@ output = output * 128
 lab_result = tf.stack([l_channel, output[:, :, 0], output[:, :, 1]], axis=-1)
 
 # convert lab result to rgb
-rgb_colorized = color.lab2rgb(lab_result)
+rgb_colorized = lab_to_rgb(lab_result).numpy()
 
 # plot the result
-plt.imshow(rgb_colorized)
+plt.imshow(rgb_colorized[:, :, 0])
 plt.show()
